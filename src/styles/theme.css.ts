@@ -146,6 +146,79 @@ export const lightTheme = createTheme(vars, {
   },
 });
 
+// Dark theme
+export const darkTheme = createTheme(vars, {
+  color: {
+    // Brighter teal for dark mode visibility
+    primary: '#14b8a6',
+    primaryHover: '#0d9488',
+    primaryLight: '#134e4a',
+    
+    // Warm gold - adjusted for dark mode
+    secondary: '#f59e0b',
+    secondaryHover: '#d97706',
+    
+    // Semantic - brighter for dark mode
+    success: '#10b981',
+    successLight: '#064e3b',
+    error: '#ef4444',
+    errorLight: '#7f1d1d',
+    warning: '#f59e0b',
+    warningLight: '#78350f',
+    
+    // Neutrals - deep charcoal palette
+    background: '#0f1419',
+    surface: '#1a1f26',
+    surfaceHover: '#242b33',
+    border: '#2d3640',
+    borderLight: '#3d4750',
+    
+    // Text - soft white for readability
+    text: '#e7e9ea',
+    textSecondary: '#8b98a5',
+    textMuted: '#6e7681',
+    textInverse: '#0f1419',
+  },
+  space: {
+    none: '0',
+    xs: '4px',
+    sm: '8px',
+    md: '16px',
+    lg: '24px',
+    xl: '32px',
+    xxl: '48px',
+    xxxl: '64px',
+  },
+  fontSize: {
+    xs: '0.75rem',
+    sm: '0.875rem',
+    md: '1rem',
+    lg: '1.125rem',
+    xl: '1.25rem',
+    xxl: '1.5rem',
+    xxxl: '2rem',
+  },
+  fontWeight: {
+    normal: '400',
+    medium: '500',
+    semibold: '600',
+    bold: '700',
+  },
+  borderRadius: {
+    sm: '4px',
+    md: '8px',
+    lg: '12px',
+    xl: '16px',
+    full: '9999px',
+  },
+  shadow: {
+    sm: '0 1px 3px 0 rgba(0, 0, 0, 0.3)',
+    md: '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
+    lg: '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+    xl: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3)',
+  },
+});
+
 // Utility class for applying the theme
 export const themeClass = style({
   fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',

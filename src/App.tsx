@@ -1,10 +1,12 @@
 import { useEquityStore } from './store/useEquityStore';
 import { PackageSection, PersonalInfoForm, Results, Disclaimer } from './components';
 import { Button } from './components/ui';
-import { lightTheme, themeClass, vars } from './styles/theme.css';
+import { useTheme } from './hooks';
+import { themeClass, vars } from './styles/theme.css';
 import './styles/global.css';
 
 function App() {
+  const themeClassName = useTheme();
   const personalInfo = useEquityStore((state) => state.personalInfo);
   const stockOptions = useEquityStore((state) => state.stockOptions);
   const rsus = useEquityStore((state) => state.rsus);
@@ -24,7 +26,7 @@ function App() {
   const isCalculateEnabled = canCalculate && hasPackagesWithValue;
 
   return (
-    <div className={`${lightTheme} ${themeClass}`} style={{ minHeight: '100vh' }}>
+    <div className={`${themeClassName} ${themeClass}`} style={{ minHeight: '100vh' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: vars.space.lg }}>
         {/* Header */}
         <header style={{ textAlign: 'center', marginBottom: vars.space.xl }}>
