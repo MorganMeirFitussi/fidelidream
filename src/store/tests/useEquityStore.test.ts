@@ -183,6 +183,41 @@ describe('useEquityStore', () => {
       });
       expect(useEquityStore.getState().calculationResult).toBeNull();
     });
+
+    it('should reorder stock options', () => {
+      act(() => {
+        useEquityStore.getState().addStockOption(createStockOption({ name: 'Grant A' }));
+        useEquityStore.getState().addStockOption(createStockOption({ name: 'Grant B' }));
+        useEquityStore.getState().addStockOption(createStockOption({ name: 'Grant C' }));
+      });
+      
+      const initialOrder = useEquityStore.getState().stockOptions.map(o => o.name);
+      expect(initialOrder).toEqual(['Grant A', 'Grant B', 'Grant C']);
+
+      // Move Grant A from index 0 to index 2
+      act(() => {
+        useEquityStore.getState().reorderStockOptions(0, 2);
+      });
+
+      const newOrder = useEquityStore.getState().stockOptions.map(o => o.name);
+      expect(newOrder).toEqual(['Grant B', 'Grant C', 'Grant A']);
+    });
+
+    it('should reorder stock options moving from end to start', () => {
+      act(() => {
+        useEquityStore.getState().addStockOption(createStockOption({ name: 'Grant A' }));
+        useEquityStore.getState().addStockOption(createStockOption({ name: 'Grant B' }));
+        useEquityStore.getState().addStockOption(createStockOption({ name: 'Grant C' }));
+      });
+
+      // Move Grant C from index 2 to index 0
+      act(() => {
+        useEquityStore.getState().reorderStockOptions(2, 0);
+      });
+
+      const newOrder = useEquityStore.getState().stockOptions.map(o => o.name);
+      expect(newOrder).toEqual(['Grant C', 'Grant A', 'Grant B']);
+    });
   });
 
   describe('RSUs', () => {
@@ -257,6 +292,41 @@ describe('useEquityStore', () => {
       const state = useEquityStore.getState();
       expect(state.rsus).toHaveLength(1);
       expect(state.rsus[0].name).toBe('RSU Grant 2');
+    });
+
+    it('should reorder RSUs', () => {
+      act(() => {
+        useEquityStore.getState().addRSU(createRSU({ name: 'RSU A' }));
+        useEquityStore.getState().addRSU(createRSU({ name: 'RSU B' }));
+        useEquityStore.getState().addRSU(createRSU({ name: 'RSU C' }));
+      });
+      
+      const initialOrder = useEquityStore.getState().rsus.map(r => r.name);
+      expect(initialOrder).toEqual(['RSU A', 'RSU B', 'RSU C']);
+
+      // Move RSU A from index 0 to index 2
+      act(() => {
+        useEquityStore.getState().reorderRSUs(0, 2);
+      });
+
+      const newOrder = useEquityStore.getState().rsus.map(r => r.name);
+      expect(newOrder).toEqual(['RSU B', 'RSU C', 'RSU A']);
+    });
+
+    it('should reorder RSUs moving from end to start', () => {
+      act(() => {
+        useEquityStore.getState().addRSU(createRSU({ name: 'RSU A' }));
+        useEquityStore.getState().addRSU(createRSU({ name: 'RSU B' }));
+        useEquityStore.getState().addRSU(createRSU({ name: 'RSU C' }));
+      });
+
+      // Move RSU C from index 2 to index 0
+      act(() => {
+        useEquityStore.getState().reorderRSUs(2, 0);
+      });
+
+      const newOrder = useEquityStore.getState().rsus.map(r => r.name);
+      expect(newOrder).toEqual(['RSU C', 'RSU A', 'RSU B']);
     });
   });
 

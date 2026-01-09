@@ -1,5 +1,5 @@
 import { useEquityStore } from '../store/useEquityStore';
-import { useModal } from '../hooks';
+import { useModal, useDragAndDrop } from '../hooks';
 import { PackageForm } from './PackageForm';
 import { PackageCard } from './PackageCard';
 import { Button } from './ui';
@@ -20,9 +20,23 @@ export function PackageSection({ type }: PackageSectionProps) {
   const stockPrice = useEquityStore((state) => state.personalInfo.stockPrice);
   const deleteOption = useEquityStore((state) => state.deleteStockOption);
   const deleteRSU = useEquityStore((state) => state.deleteRSU);
+  const reorderStockOptions = useEquityStore((state) => state.reorderStockOptions);
+  const reorderRSUs = useEquityStore((state) => state.reorderRSUs);
 
   // Modal state
   const modal = useModal<StockOptionPackage | RSUPackage>();
+
+  // Drag and drop
+  const handleReorder = isOption ? reorderStockOptions : reorderRSUs;
+  const {
+    draggedIndex,
+    dragOverIndex,
+    handleDragStart,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    handleDragEnd,
+  } = useDragAndDrop(handleReorder);
 
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this package?')) {
@@ -52,7 +66,7 @@ export function PackageSection({ type }: PackageSectionProps) {
         </div>
       ) : (
         <div className={styles.grid}>
-          {packages.map((pkg) => (
+          {packages.map((pkg, index) => (
             <PackageCard
               key={pkg.id}
               package_={pkg}
@@ -60,6 +74,13 @@ export function PackageSection({ type }: PackageSectionProps) {
               currentStockPrice={isOption ? stockPrice : undefined}
               onEdit={() => modal.openWith(pkg)}
               onDelete={() => handleDelete(pkg.id)}
+              isDragging={draggedIndex === index}
+              isDragOver={dragOverIndex === index}
+              onDragStart={handleDragStart(index)}
+              onDragOver={handleDragOver(index)}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop(index)}
+              onDragEnd={handleDragEnd}
             />
           ))}
         </div>

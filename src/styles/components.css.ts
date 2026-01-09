@@ -77,11 +77,26 @@ export const packageCard = style({
   borderRadius: vars.borderRadius.lg,
   padding: vars.space.lg,
   border: `1px solid ${vars.color.border}`,
-  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+  transition: 'border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease',
+  cursor: 'grab',
   ':hover': {
     borderColor: vars.color.primary,
     boxShadow: vars.shadow.sm,
   },
+});
+
+export const packageCardDragging = style({
+  opacity: 0.5,
+  transform: 'scale(1.02)',
+  boxShadow: vars.shadow.lg,
+  cursor: 'grabbing',
+});
+
+export const packageCardDragOver = style({
+  borderColor: vars.color.primary,
+  borderWidth: '2px',
+  borderStyle: 'dashed',
+  backgroundColor: vars.color.primaryLight,
 });
 
 export const packageCardHeader = style({
@@ -89,6 +104,24 @@ export const packageCardHeader = style({
   justifyContent: 'space-between',
   alignItems: 'flex-start',
   marginBottom: vars.space.md,
+});
+
+export const dragHandle = style({
+  cursor: 'grab',
+  color: vars.color.textMuted,
+  padding: vars.space.xs,
+  marginRight: vars.space.xs,
+  fontSize: vars.fontSize.md,
+  display: 'flex',
+  alignItems: 'center',
+  ':hover': {
+    color: vars.color.textSecondary,
+  },
+});
+
+export const packageNameContainer = style({
+  display: 'flex',
+  alignItems: 'center',
 });
 
 export const packageName = style({

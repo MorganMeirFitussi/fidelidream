@@ -28,11 +28,13 @@ interface EquityState {
   addStockOption: (option: Omit<StockOptionPackage, 'id' | 'createdAt'>) => void;
   updateStockOption: (id: string, updates: Partial<StockOptionPackage>) => void;
   deleteStockOption: (id: string) => void;
+  reorderStockOptions: (fromIndex: number, toIndex: number) => void;
   
   // RSU actions
   addRSU: (rsu: Omit<RSUPackage, 'id' | 'createdAt'>) => void;
   updateRSU: (id: string, updates: Partial<RSUPackage>) => void;
   deleteRSU: (id: string) => void;
+  reorderRSUs: (fromIndex: number, toIndex: number) => void;
   
   // Calculation
   calculate: () => void;
@@ -88,6 +90,15 @@ export const useEquityStore = create<EquityState>()(
         }));
       },
       
+      reorderStockOptions: (fromIndex, toIndex) => {
+        set((state) => {
+          const newOptions = [...state.stockOptions];
+          const [removed] = newOptions.splice(fromIndex, 1);
+          newOptions.splice(toIndex, 0, removed);
+          return { stockOptions: newOptions };
+        });
+      },
+      
       // RSU actions
       addRSU: (rsu) => {
         const newRSU: RSUPackage = {
@@ -115,6 +126,15 @@ export const useEquityStore = create<EquityState>()(
           rsus: state.rsus.filter((rsu) => rsu.id !== id),
           calculationResult: null,
         }));
+      },
+      
+      reorderRSUs: (fromIndex, toIndex) => {
+        set((state) => {
+          const newRSUs = [...state.rsus];
+          const [removed] = newRSUs.splice(fromIndex, 1);
+          newRSUs.splice(toIndex, 0, removed);
+          return { rsus: newRSUs };
+        });
       },
       
       // Calculation

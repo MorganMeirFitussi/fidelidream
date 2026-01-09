@@ -10,9 +10,30 @@ interface PackageCardProps {
   currentStockPrice?: number;
   onEdit: () => void;
   onDelete: () => void;
+  // Drag and drop props
+  isDragging?: boolean;
+  isDragOver?: boolean;
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDragLeave?: () => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
 }
 
-export function PackageCard({ package_, type, currentStockPrice, onEdit, onDelete }: PackageCardProps) {
+export function PackageCard({ 
+  package_, 
+  type, 
+  currentStockPrice, 
+  onEdit, 
+  onDelete,
+  isDragging,
+  isDragOver,
+  onDragStart,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  onDragEnd,
+}: PackageCardProps) {
   const isOption = type === 'option';
   const option = package_ as StockOptionPackage;
   const rsu = package_ as RSUPackage;
@@ -20,10 +41,27 @@ export function PackageCard({ package_, type, currentStockPrice, onEdit, onDelet
   const route = isOption ? detectTaxRoute(option.exercisePrice, option.averagePrice) : null;
   const isUnderwater = isOption && currentStockPrice !== undefined && currentStockPrice > 0 && currentStockPrice < option.exercisePrice;
 
+  const cardClassName = [
+    styles.packageCard,
+    isDragging && styles.packageCardDragging,
+    isDragOver && styles.packageCardDragOver,
+  ].filter(Boolean).join(' ');
+
   return (
-    <div className={styles.packageCard}>
+    <div 
+      className={cardClassName}
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+    >
       <div className={styles.packageCardHeader}>
-        <h4 className={styles.packageName}>{package_.name}</h4>
+        <div className={styles.packageNameContainer}>
+          <span className={styles.dragHandle} title="Drag to reorder">⋮⋮</span>
+          <h4 className={styles.packageName}>{package_.name}</h4>
+        </div>
         <div className={styles.packageActions}>
           <button className={styles.actionButton} onClick={onEdit} title="Edit package">
             ✏️
