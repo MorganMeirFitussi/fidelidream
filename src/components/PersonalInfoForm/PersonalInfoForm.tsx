@@ -135,8 +135,7 @@ export function PersonalInfoForm() {
             <input
               type="number"
               className={`${styles.input} ${styles.inputNoPadding}`}
-              defaultValue={personalInfo.exchangeRate || ''}
-              onBlur={handleBlur('exchangeRate')}
+              value={personalInfo.exchangeRate || ''}
               onChange={handleChange('exchangeRate')}
               placeholder="3.20"
               step="0.01"
