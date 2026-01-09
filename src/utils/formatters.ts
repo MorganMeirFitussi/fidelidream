@@ -76,7 +76,6 @@ export function calculateVestedQuantity(
 
   // Calculate days since grant for more precision
   const daysSinceGrant = Math.floor((today.getTime() - grantDate.getTime()) / (1000 * 60 * 60 * 24));
-  const totalVestingDays = vestingDurationYears * 365.25; // Account for leap years
 
   // Determine vesting periods based on frequency
   let periodsPerYear: number;

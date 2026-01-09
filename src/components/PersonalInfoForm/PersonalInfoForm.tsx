@@ -1,9 +1,15 @@
+import { useState } from 'react';
 import { useEquityStore } from '../../store/useEquityStore';
+import { fetchExchangeRate } from '../../utils/exchangeRate';
 import * as styles from './PersonalInfoForm.css';
 
 export function PersonalInfoForm() {
   const personalInfo = useEquityStore((state) => state.personalInfo);
   const updatePersonalInfo = useEquityStore((state) => state.updatePersonalInfo);
+  
+  const [isLoadingRate, setIsLoadingRate] = useState(false);
+  const [rateDate, setRateDate] = useState<string | null>(null);
+  const [rateError, setRateError] = useState<string | null>(null);
 
   const handleBlur = (field: keyof typeof personalInfo) => (
     e: React.FocusEvent<HTMLInputElement>
@@ -23,6 +29,31 @@ export function PersonalInfoForm() {
     } else if (e.target.value === '') {
       updatePersonalInfo({ [field]: 0 });
     }
+  };
+
+  const handleFetchRate = async () => {
+    setIsLoadingRate(true);
+    setRateError(null);
+    
+    try {
+      const { rate, date } = await fetchExchangeRate();
+      updatePersonalInfo({ exchangeRate: rate });
+      setRateDate(date);
+    } catch (err) {
+      setRateError('Failed to fetch rate');
+      console.error('Exchange rate fetch error:', err);
+    } finally {
+      setIsLoadingRate(false);
+    }
+  };
+
+  const formatRateDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
   };
 
   return (
@@ -86,7 +117,20 @@ export function PersonalInfoForm() {
         </div>
 
         <div className={styles.field}>
-          <label className={styles.label}>USD/NIS Exchange Rate</label>
+          <div className={styles.labelWithButton}>
+            <label className={styles.label}>USD/NIS Exchange Rate</label>
+            <button 
+              className={styles.refreshButton}
+              onClick={handleFetchRate}
+              disabled={isLoadingRate}
+              title="Fetch current rate"
+            >
+              <span className={`${styles.refreshIcon} ${isLoadingRate ? styles.refreshIconSpinning : ''}`}>
+                🔄
+              </span>
+              {isLoadingRate ? 'Loading...' : 'Fetch'}
+            </button>
+          </div>
           <div className={styles.inputWrapper}>
             <input
               type="number"
@@ -100,7 +144,15 @@ export function PersonalInfoForm() {
               max="10"
             />
           </div>
-          <span className={styles.helpText}>Current rate for NIS conversion</span>
+          <span className={styles.helpText}>
+            {rateError ? (
+              <span style={{ color: 'var(--color-error)' }}>{rateError}</span>
+            ) : rateDate ? (
+              <>Updated: {formatRateDate(rateDate)}</>
+            ) : (
+              <>Click Fetch to get current rate</>
+            )}
+          </span>
         </div>
       </div>
     </div>

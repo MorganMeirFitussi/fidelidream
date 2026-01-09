@@ -3,29 +3,29 @@ import { z } from 'zod';
 // Personal Info Schema
 export const personalInfoSchema = z.object({
   monthlySalary: z
-    .number({ required_error: 'Monthly salary is required' })
+    .number({ message: 'Monthly salary is required' })
     .positive('Monthly salary must be positive'),
   creditPoints: z
-    .number({ required_error: 'Credit points are required' })
+    .number({ message: 'Credit points are required' })
     .min(0, 'Credit points cannot be negative')
     .max(20, 'Credit points cannot exceed 20'),
   exchangeRate: z
-    .number({ required_error: 'Exchange rate is required' })
+    .number({ message: 'Exchange rate is required' })
     .min(1, 'Exchange rate must be at least 1')
     .max(10, 'Exchange rate cannot exceed 10'),
   stockPrice: z
-    .number({ required_error: 'Stock price is required' })
+    .number({ message: 'Stock price is required' })
     .positive('Stock price must be positive'),
 });
 
 // Stock Option Package Schema
 export const stockOptionSchema = z.object({
   name: z
-    .string({ required_error: 'Name is required' })
+    .string({ message: 'Name is required' })
     .min(1, 'Name is required')
     .max(50, 'Name cannot exceed 50 characters'),
   totalQuantity: z
-    .number({ required_error: 'Total quantity is required' })
+    .number({ message: 'Total quantity is required' })
     .int('Quantity must be a whole number')
     .min(0, 'Quantity cannot be negative'),
   vestedQuantity: z
@@ -34,17 +34,17 @@ export const stockOptionSchema = z.object({
     .min(0, 'Vested quantity cannot be negative')
     .optional(),
   usedQuantity: z
-    .number({ required_error: 'Used quantity is required' })
+    .number({ message: 'Used quantity is required' })
     .int('Quantity must be a whole number')
     .min(0, 'Used quantity cannot be negative'),
   exercisePrice: z
-    .number({ required_error: 'Exercise price is required' })
+    .number({ message: 'Exercise price is required' })
     .min(0, 'Exercise price cannot be negative'),
   averagePrice: z
-    .number({ required_error: 'Average price is required' })
+    .number({ message: 'Average price is required' })
     .min(0, 'Average price cannot be negative'),
   firstVestingDate: z
-    .string({ required_error: 'First vesting date is required' })
+    .string({ message: 'First vesting date is required' })
     .min(1, 'First vesting date is required'),
   vestingDurationYears: z
     .number()
@@ -72,11 +72,11 @@ export const stockOptionSchema = z.object({
 // RSU Package Schema
 export const rsuSchema = z.object({
   name: z
-    .string({ required_error: 'Name is required' })
+    .string({ message: 'Name is required' })
     .min(1, 'Name is required')
     .max(50, 'Name cannot exceed 50 characters'),
   totalQuantity: z
-    .number({ required_error: 'Total quantity is required' })
+    .number({ message: 'Total quantity is required' })
     .int('Quantity must be a whole number')
     .min(0, 'Quantity cannot be negative'),
   vestedQuantity: z
@@ -85,14 +85,14 @@ export const rsuSchema = z.object({
     .min(0, 'Vested quantity cannot be negative')
     .optional(),
   usedQuantity: z
-    .number({ required_error: 'Used quantity is required' })
+    .number({ message: 'Used quantity is required' })
     .int('Quantity must be a whole number')
     .min(0, 'Used quantity cannot be negative'),
   averageVestingPrice: z
-    .number({ required_error: 'Average vesting price is required' })
+    .number({ message: 'Average vesting price is required' })
     .min(0, 'Average vesting price cannot be negative'),
   firstVestingDate: z
-    .string({ required_error: 'First vesting date is required' })
+    .string({ message: 'First vesting date is required' })
     .min(1, 'First vesting date is required'),
   vestingDurationYears: z
     .number()

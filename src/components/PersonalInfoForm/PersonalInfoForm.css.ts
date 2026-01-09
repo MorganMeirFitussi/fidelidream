@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css';
+import { style, keyframes } from '@vanilla-extract/css';
 import { vars } from '../../styles/theme.css';
 
 export const container = style({
@@ -86,4 +86,53 @@ export const helpText = style({
   fontSize: vars.fontSize.xs,
   color: vars.color.textMuted,
   marginTop: vars.space.xs,
+});
+
+export const labelWithButton = style({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+});
+
+export const refreshButton = style({
+  padding: '4px 8px',
+  fontSize: vars.fontSize.sm,
+  borderRadius: vars.borderRadius.sm,
+  backgroundColor: vars.color.primaryLight,
+  color: vars.color.primary,
+  cursor: 'pointer',
+  transition: 'all 0.2s ease',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '4px',
+  
+  ':hover': {
+    backgroundColor: vars.color.primary,
+    color: vars.color.textInverse,
+  },
+  
+  ':disabled': {
+    opacity: 0.6,
+    cursor: 'not-allowed',
+  },
+});
+
+const spin = keyframes({
+  from: { transform: 'rotate(0deg)' },
+  to: { transform: 'rotate(360deg)' },
+});
+
+export const refreshIcon = style({
+  display: 'inline-block',
+  transition: 'transform 0.3s ease',
+});
+
+export const refreshIconSpinning = style({
+  animation: `${spin} 1s linear infinite`,
+});
+
+export const inputWithButton = style({
+  display: 'flex',
+  gap: vars.space.sm,
+  alignItems: 'center',
 });
