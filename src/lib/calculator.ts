@@ -4,7 +4,8 @@ import type {
   RSUPackage, 
   CalculationResult, 
   TaxBreakdown,
-  PackageResult 
+  PackageResult,
+  SimulatorParams
 } from '../types';
 import { 
   getMarginalTaxRate,
@@ -12,17 +13,29 @@ import {
 } from './taxCalculations';
 import { detectTaxRoute, getAvailableQuantity } from './optionsCalculations';
 import { BITUAH_LEUMI, CAPITAL_GAINS } from './constants';
+import { calculateVestedQuantity } from '../utils/formatters';
 
 /**
  * Main calculation function that processes all packages
  * Uses marginal rate for work income and flat 30% for capital gains
+ * 
+ * @param personalInfo - User's personal information
+ * @param stockOptions - List of stock option packages
+ * @param rsus - List of RSU packages
+ * @param simulation - Optional simulation parameters for projecting future values
  */
 export function calculateEquity(
   personalInfo: PersonalInfo,
   stockOptions: StockOptionPackage[],
-  rsus: RSUPackage[]
+  rsus: RSUPackage[],
+  simulation?: SimulatorParams
 ): CalculationResult {
-  const { stockPrice, exchangeRate, monthlySalary, creditPoints } = personalInfo;
+  const { monthlySalary, creditPoints } = personalInfo;
+  
+  // Use simulation values if provided, otherwise use personalInfo
+  const stockPrice = simulation?.stockPrice ?? personalInfo.stockPrice;
+  const exchangeRate = simulation?.exchangeRate ?? personalInfo.exchangeRate;
+  
   const annualSalary = monthlySalary * 12;
   
   // Convert stock price to NIS
@@ -46,8 +59,17 @@ export function calculateEquity(
 
   // Process stock options
   for (const option of stockOptions) {
-    // Use vestedQuantity if available, otherwise fall back to totalQuantity for backwards compatibility
-    const vestedQty = option.vestedQuantity ?? option.totalQuantity;
+    // If simulating, recalculate vested quantity as of target date
+    // Otherwise use stored vestedQuantity (or totalQuantity for backwards compatibility)
+    const vestedQty = simulation?.targetDate
+      ? calculateVestedQuantity(
+          option.totalQuantity,
+          option.firstVestingDate,
+          option.vestingDurationYears || 4,
+          option.vestingFrequency || 'quarterly',
+          simulation.targetDate
+        )
+      : (option.vestedQuantity ?? option.totalQuantity);
     const availableQty = getAvailableQuantity(vestedQty, option.usedQuantity);
     
     // Convert prices to NIS
@@ -107,7 +129,16 @@ export function calculateEquity(
 
   // Process RSUs
   for (const rsu of rsus) {
-    const vestedQty = rsu.vestedQuantity;
+    // If simulating, recalculate vested quantity as of target date
+    const vestedQty = simulation?.targetDate
+      ? calculateVestedQuantity(
+          rsu.totalQuantity,
+          rsu.firstVestingDate,
+          rsu.vestingDurationYears || 4,
+          rsu.vestingFrequency || 'quarterly',
+          simulation.targetDate
+        )
+      : rsu.vestedQuantity;
     const usedQty = rsu.usedQuantity || 0;
     const availableQty = Math.max(0, vestedQty - usedQty);
     
@@ -225,8 +256,15 @@ export function calculateEquity(
   // Social security and credits are shown at the total level only
   const updatedPackageResults = packageResults;
 
+  // Create effectivePersonalInfo with simulation values applied
+  const effectivePersonalInfo: PersonalInfo = {
+    ...personalInfo,
+    stockPrice,
+    exchangeRate,
+  };
+
   return {
-    personalInfo,
+    personalInfo: effectivePersonalInfo,
     annualSalary,
     marginalTaxRate,
     packages: updatedPackageResults,

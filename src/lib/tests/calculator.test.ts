@@ -208,5 +208,116 @@ describe('calculator', () => {
       const result = calculateEquity(basePersonalInfo, [optionWithoutVested], []);
       expect(result.packages).toHaveLength(1);
     });
+
+    describe('with simulation parameters', () => {
+      it('should use simulation stock price', () => {
+        const resultNoSim = calculateEquity(basePersonalInfo, [baseStockOption], []);
+        const resultWithSim = calculateEquity(basePersonalInfo, [baseStockOption], [], {
+          targetDate: '2025-01-01',
+          stockPrice: 40, // Double the current price
+        });
+        
+        // Higher stock price should result in higher gross value
+        expect(resultWithSim.totals.grossValueNIS).toBeGreaterThan(resultNoSim.totals.grossValueNIS);
+        // Personal info should reflect simulation values
+        expect(resultWithSim.personalInfo.stockPrice).toBe(40);
+      });
+
+      it('should use simulation exchange rate when provided', () => {
+        const resultWithSim = calculateEquity(basePersonalInfo, [baseStockOption], [], {
+          targetDate: '2025-01-01',
+          stockPrice: 20,
+          exchangeRate: 4.0, // Higher exchange rate
+        });
+        
+        expect(resultWithSim.personalInfo.exchangeRate).toBe(4.0);
+      });
+
+      it('should keep original exchange rate when not provided in simulation', () => {
+        const resultWithSim = calculateEquity(basePersonalInfo, [baseStockOption], [], {
+          targetDate: '2025-01-01',
+          stockPrice: 20,
+        });
+        
+        expect(resultWithSim.personalInfo.exchangeRate).toBe(basePersonalInfo.exchangeRate);
+      });
+
+      it('should recalculate vested quantities for future date', () => {
+        // Create an option that is partially vested today
+        const recentOption: StockOptionPackage = {
+          ...baseStockOption,
+          totalQuantity: 1000,
+          vestedQuantity: 100, // Currently vested
+          usedQuantity: 0,
+          firstVestingDate: '2024-01-01',
+          vestingDurationYears: 4,
+          vestingFrequency: 'quarterly',
+        };
+        
+        const resultNoSim = calculateEquity(basePersonalInfo, [recentOption], []);
+        const resultWithSim = calculateEquity(basePersonalInfo, [recentOption], [], {
+          targetDate: '2028-01-01', // 4 years after grant - fully vested
+          stockPrice: 20,
+        });
+        
+        // Future date should have more vested (up to 1000)
+        expect(resultWithSim.totals.grossValueNIS).toBeGreaterThan(resultNoSim.totals.grossValueNIS);
+      });
+
+      it('should recalculate RSU vested quantities for future date', () => {
+        const recentRSU: RSUPackage = {
+          ...baseRSU,
+          totalQuantity: 1000,
+          vestedQuantity: 100, // Currently vested
+          usedQuantity: 0,
+          firstVestingDate: '2024-01-01',
+          vestingDurationYears: 4,
+          vestingFrequency: 'quarterly',
+        };
+        
+        const resultNoSim = calculateEquity(basePersonalInfo, [], [recentRSU]);
+        const resultWithSim = calculateEquity(basePersonalInfo, [], [recentRSU], {
+          targetDate: '2028-01-01', // 4 years after grant
+          stockPrice: 20,
+        });
+        
+        // Future date should have more vested
+        expect(resultWithSim.totals.grossValueNIS).toBeGreaterThan(resultNoSim.totals.grossValueNIS);
+      });
+
+      it('should use default vesting duration and frequency for options when missing', () => {
+        const optionWithMissingVesting: StockOptionPackage = {
+          ...baseStockOption,
+          vestingDurationYears: undefined as unknown as number,
+          vestingFrequency: undefined as unknown as 'quarterly',
+          firstVestingDate: '2020-01-01', // Old date so plenty is vested
+        };
+        
+        const result = calculateEquity(basePersonalInfo, [optionWithMissingVesting], [], {
+          targetDate: '2025-01-01',
+          stockPrice: 20,
+        });
+        
+        // Should not crash and should calculate some value
+        expect(result.packages).toHaveLength(1);
+      });
+
+      it('should use default vesting duration and frequency for RSUs when missing', () => {
+        const rsuWithMissingVesting: RSUPackage = {
+          ...baseRSU,
+          vestingDurationYears: undefined as unknown as number,
+          vestingFrequency: undefined as unknown as 'quarterly',
+          firstVestingDate: '2020-01-01', // Old date so plenty is vested
+        };
+        
+        const result = calculateEquity(basePersonalInfo, [], [rsuWithMissingVesting], {
+          targetDate: '2025-01-01',
+          stockPrice: 20,
+        });
+        
+        // Should not crash and should calculate some value
+        expect(result.packages).toHaveLength(1);
+      });
+    });
   });
 });

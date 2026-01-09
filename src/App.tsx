@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useEquityStore } from './store/useEquityStore';
-import { PackageSection, PersonalInfoForm, Results, Disclaimer } from './components';
+import { PackageSection, PersonalInfoForm, Results, Disclaimer, SimulatorModal } from './components';
 import { Button } from './components/ui';
 import { useTheme } from './hooks';
 import { themeClass, vars } from './styles/theme.css';
@@ -7,6 +8,7 @@ import './styles/global.css';
 
 function App() {
   const themeClassName = useTheme();
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
   const personalInfo = useEquityStore((state) => state.personalInfo);
   const stockOptions = useEquityStore((state) => state.stockOptions);
   const rsus = useEquityStore((state) => state.rsus);
@@ -48,8 +50,8 @@ function App() {
 
           <PackageSection type="option" />
 
-          {/* Calculate Button */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: vars.space.md, flexWrap: 'wrap' }}>
             <Button
               size="lg"
               onClick={calculate}
@@ -62,9 +64,28 @@ function App() {
             >
               🧮 Calculate Net Value
             </Button>
+            <Button
+              size="lg"
+              variant="secondary"
+              onClick={() => setIsSimulatorOpen(true)}
+              disabled={stockOptions.length === 0 && rsus.length === 0}
+              style={{ 
+                paddingLeft: vars.space.xl, 
+                paddingRight: vars.space.xl,
+                fontSize: vars.fontSize.lg,
+              }}
+            >
+              🔮 Simulator
+            </Button>
           </div>
 
           {calculationResult && <Results result={calculationResult} />}
+
+          {/* Simulator Modal */}
+          <SimulatorModal 
+            isOpen={isSimulatorOpen} 
+            onClose={() => setIsSimulatorOpen(false)} 
+          />
         </div>
 
         {/* Footer */}

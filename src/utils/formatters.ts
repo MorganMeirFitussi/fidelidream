@@ -56,26 +56,28 @@ export function formatInputValue(value: number | undefined, prefix?: string): st
 }
 
 // Calculate vested quantity based on vesting schedule
+// asOfDate: Optional date to calculate vesting as of (for simulation), defaults to today
 export function calculateVestedQuantity(
   totalQuantity: number,
   firstVestingDate: string,
   vestingDurationYears: number,
-  vestingFrequency: 'monthly' | 'quarterly' | 'annually'
+  vestingFrequency: 'monthly' | 'quarterly' | 'annually',
+  asOfDate?: string
 ): number {
   if (!firstVestingDate || totalQuantity <= 0 || vestingDurationYears <= 0) {
     return 0;
   }
 
   const grantDate = new Date(firstVestingDate);
-  const today = new Date();
+  const targetDate = asOfDate ? new Date(asOfDate) : new Date();
   
-  // If grant date is in the future, nothing is vested
-  if (grantDate > today) {
+  // If grant date is after target date, nothing is vested
+  if (grantDate > targetDate) {
     return 0;
   }
 
   // Calculate days since grant for more precision
-  const daysSinceGrant = Math.floor((today.getTime() - grantDate.getTime()) / (1000 * 60 * 60 * 24));
+  const daysSinceGrant = Math.floor((targetDate.getTime() - grantDate.getTime()) / (1000 * 60 * 60 * 24));
 
   // Determine vesting periods based on frequency
   let periodsPerYear: number;

@@ -212,5 +212,51 @@ describe('formatters', () => {
       // After ~3.5 months, only 1 full quarter completed = 1/16 = 62.5 -> 63 rounded
       expect(result).toBe(63);
     });
+
+    describe('with asOfDate parameter (simulation)', () => {
+      it('should use asOfDate instead of current date', () => {
+        vi.setSystemTime(new Date('2024-01-01'));
+        // Calculate as of 2 years after grant date (instead of current date)
+        const result = calculateVestedQuantity(1000, '2022-01-01', 4, 'quarterly', '2024-01-01');
+        // Days since grant: 730 (2 years)
+        // Days per quarter: 365.25 / 4 = 91.3125
+        // Completed quarters: floor(730 / 91.3125) = floor(7.99) = 7
+        // Vested: round(1000 * 7/16) = round(437.5) = 438
+        expect(result).toBe(438);
+      });
+
+      it('should calculate future vesting with asOfDate', () => {
+        vi.setSystemTime(new Date('2024-01-01'));
+        // Calculate as of 3 years after grant date (in the future)
+        const result = calculateVestedQuantity(1000, '2022-01-01', 4, 'quarterly', '2025-01-01');
+        // Days since grant: 1096 (3 years + leap day)
+        // Days per quarter: 91.3125
+        // Completed quarters: floor(1096 / 91.3125) = floor(12.002) = 12
+        // Vested: round(1000 * 12/16) = round(750) = 750
+        expect(result).toBe(750);
+      });
+
+      it('should return 0 when asOfDate is before grant date', () => {
+        vi.setSystemTime(new Date('2024-01-01'));
+        const result = calculateVestedQuantity(1000, '2022-01-01', 4, 'quarterly', '2021-01-01');
+        expect(result).toBe(0);
+      });
+
+      it('should cap at total quantity for asOfDate past full vesting', () => {
+        vi.setSystemTime(new Date('2024-01-01'));
+        const result = calculateVestedQuantity(1000, '2022-01-01', 4, 'quarterly', '2030-01-01');
+        expect(result).toBe(1000);
+      });
+
+      it('should work with monthly vesting and asOfDate', () => {
+        vi.setSystemTime(new Date('2024-01-01'));
+        const result = calculateVestedQuantity(1200, '2022-01-01', 4, 'monthly', '2023-07-01');
+        // Days since grant: 546 (1.5 years)
+        // Days per month: 30.4375
+        // Completed months: floor(546 / 30.4375) = floor(17.94) = 17
+        // Vested: round(1200 * 17/48) = round(425) = 425
+        expect(result).toBe(425);
+      });
+    });
   });
 });

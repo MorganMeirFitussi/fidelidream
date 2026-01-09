@@ -119,3 +119,10 @@ export interface RSUFormData {
 
 // Package type union for modal
 export type PackageType = 'option' | 'rsu';
+
+// Simulator parameters for projecting future equity value
+export interface SimulatorParams {
+  targetDate: string; // ISO format - future date to simulate
+  stockPrice: number; // Hypothetical stock price in USD
+  exchangeRate?: number; // Optional custom exchange rate
+}
