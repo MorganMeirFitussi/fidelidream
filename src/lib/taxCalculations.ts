@@ -38,8 +38,10 @@ export function getMarginalTaxRate(annualIncome: number): number {
     }
   }
   
-  // If income exceeds all brackets, return highest rate
-  return TAX_BRACKETS[TAX_BRACKETS.length - 1].rate;
+  // Last bracket has ceiling: Infinity, so loop always returns
+  // This line is for TypeScript completeness only
+  /* istanbul ignore next -- @preserve */
+  return TAX_BRACKETS[TAX_BRACKETS.length - 1].rate; // unreachable
 }
 
 /**

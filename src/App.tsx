@@ -1,12 +1,8 @@
 import { useEquityStore } from './store/useEquityStore';
-import { PersonalInfoForm } from './components/PersonalInfoForm';
-import { StockOptionsSection } from './components/StockOptionsSection';
-import { RSUsSection } from './components/RSUsSection';
-import { Results } from './components/Results';
-import { Disclaimer } from './components/Disclaimer';
-import { lightTheme, themeClass } from './styles/theme.css';
+import { PackageSection, PersonalInfoForm, Results, Disclaimer } from './components';
+import { Button } from './components/ui';
+import { lightTheme, themeClass, vars } from './styles/theme.css';
 import './styles/global.css';
-import * as styles from './App.css';
 
 function App() {
   const personalInfo = useEquityStore((state) => state.personalInfo);
@@ -28,40 +24,49 @@ function App() {
   const isCalculateEnabled = canCalculate && hasPackagesWithValue;
 
   return (
-    <div className={`${styles.app} ${lightTheme} ${themeClass}`}>
-      <div className={styles.container}>
-        <header className={styles.header}>
-          <div className={styles.logo}>🇮🇱💼</div>
-          <h1 className={styles.title}>Israeli Equity Calculator</h1>
-          <p className={styles.subtitle}>
-            Calculate your net gains on RSUs and Stock Options, 
-            accounting for all Israeli tax rules including Article 102, 
-            Bituah Leumi, and credit points.
+    <div className={`${lightTheme} ${themeClass}`} style={{ minHeight: '100vh' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: vars.space.lg }}>
+        {/* Header */}
+        <header style={{ textAlign: 'center', marginBottom: vars.space.xl }}>
+          <div style={{ fontSize: '3rem', marginBottom: vars.space.sm }}>🇮🇱💼</div>
+          <h1 style={{ fontSize: vars.fontSize.xxxl, fontWeight: vars.fontWeight.bold, color: vars.color.text, marginBottom: vars.space.sm }}>
+            Israeli Equity Calculator
+          </h1>
+          <p style={{ fontSize: vars.fontSize.md, color: vars.color.textSecondary }}>
+            Net gains calculator for RSUs & Stock Options with Israeli tax rules
           </p>
         </header>
 
         <Disclaimer />
 
-        <PersonalInfoForm />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: vars.space.lg }}>
+          <PersonalInfoForm />
 
-        <StockOptionsSection />
+          <PackageSection type="rsu" />
 
-        <RSUsSection />
+          <PackageSection type="option" />
 
-        <div className={styles.calculateSection}>
-          <button
-            className={styles.calculateButton}
-            onClick={calculate}
-            disabled={!isCalculateEnabled}
-          >
-            <span>🧮</span>
-            Calculate Net Value
-          </button>
+          {/* Calculate Button */}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button
+              size="lg"
+              onClick={calculate}
+              disabled={!isCalculateEnabled}
+              style={{ 
+                paddingLeft: vars.space.xl, 
+                paddingRight: vars.space.xl,
+                fontSize: vars.fontSize.lg,
+              }}
+            >
+              🧮 Calculate Net Value
+            </Button>
+          </div>
+
+          {calculationResult && <Results result={calculationResult} />}
         </div>
 
-        {calculationResult && <Results result={calculationResult} />}
-
-        <footer className={styles.footer}>
+        {/* Footer */}
+        <footer style={{ textAlign: 'center', padding: vars.space.xl, marginTop: vars.space.xl, color: vars.color.textMuted, fontSize: vars.fontSize.sm }}>
           <p>
             Israeli Equity Calculator © {new Date().getFullYear()} • 
             Built for Israeli high-tech employees • 
