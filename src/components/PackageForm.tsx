@@ -117,7 +117,6 @@ export function PackageForm({ type, editingPackage, onClose }: PackageFormProps)
             value={vestedQuantity}
             readOnly
             disabled
-            style={{ backgroundColor: '#f5f5f5' }}
           />
         </FormField>
 
@@ -147,7 +146,6 @@ export function PackageForm({ type, editingPackage, onClose }: PackageFormProps)
               value={availableQuantity}
               readOnly
               disabled
-              style={{ backgroundColor: '#f5f5f5' }}
             />
           </FormField>
         </FormRow>

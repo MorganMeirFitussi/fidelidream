@@ -7,7 +7,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ prefix, error, style, ...props }, ref) => {
+  ({ prefix, error, disabled, style, ...props }, ref) => {
     const inputStyle: React.CSSProperties = {
       width: '100%',
       padding: vars.space.md,
@@ -15,10 +15,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       fontSize: vars.fontSize.md,
       border: `1px solid ${error ? vars.color.error : vars.color.border}`,
       borderRadius: vars.borderRadius.md,
-      backgroundColor: vars.color.surface,
-      color: vars.color.text,
+      backgroundColor: disabled ? vars.color.surfaceHover : vars.color.surface,
+      color: disabled ? vars.color.textMuted : vars.color.text,
       transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
       outline: 'none',
+      cursor: disabled ? 'not-allowed' : 'text',
       ...style,
     };
 
@@ -37,12 +38,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           >
             {prefix}
           </span>
-          <input ref={ref} style={inputStyle} {...props} />
+          <input ref={ref} style={inputStyle} disabled={disabled} {...props} />
         </div>
       );
     }
 
-    return <input ref={ref} style={inputStyle} {...props} />;
+    return <input ref={ref} style={inputStyle} disabled={disabled} {...props} />;
   }
 );
 
