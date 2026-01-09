@@ -84,6 +84,10 @@ export const rsuSchema = z.object({
     .int('Quantity must be a whole number')
     .min(0, 'Vested quantity cannot be negative')
     .optional(),
+  usedQuantity: z
+    .number({ required_error: 'Used quantity is required' })
+    .int('Quantity must be a whole number')
+    .min(0, 'Used quantity cannot be negative'),
   averageVestingPrice: z
     .number({ required_error: 'Average vesting price is required' })
     .min(0, 'Average vesting price cannot be negative'),
@@ -104,6 +108,12 @@ export const rsuSchema = z.object({
   {
     message: 'Vested quantity cannot exceed total quantity',
     path: ['vestedQuantity'],
+  }
+).refine(
+  (data) => !data.vestedQuantity || data.usedQuantity <= data.vestedQuantity,
+  {
+    message: 'Used quantity cannot exceed vested quantity',
+    path: ['usedQuantity'],
   }
 );
 

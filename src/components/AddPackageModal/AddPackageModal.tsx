@@ -44,10 +44,8 @@ export function AddPackageModal({ type, editingPackage, onClose }: AddPackageMod
   // Always use calculated value (no override)
   const effectiveVestedQuantity = calculatedVestedQuantity;
   
-  // For options: available = vested - used
-  const availableQuantity = isOption 
-    ? Math.max(0, effectiveVestedQuantity - (parseInt(usedQuantity) || 0))
-    : effectiveVestedQuantity;
+  // Available = vested - used (for both options and RSUs)
+  const availableQuantity = Math.max(0, effectiveVestedQuantity - (parseInt(usedQuantity) || 0));
 
   // Populate form when editing
   useEffect(() => {
@@ -65,6 +63,7 @@ export function AddPackageModal({ type, editingPackage, onClose }: AddPackageMod
         setVestingFrequency(opt.vestingFrequency || 'quarterly');
       } else {
         const rsu = editingPackage as RSUPackage;
+        setUsedQuantity((rsu.usedQuantity || 0).toString());
         setAverageVestingPrice(rsu.averageVestingPrice.toString());
         setVestingDurationYears(rsu.vestingDurationYears?.toString() || '4');
         setVestingFrequency(rsu.vestingFrequency || 'quarterly');
@@ -104,6 +103,7 @@ export function AddPackageModal({ type, editingPackage, onClose }: AddPackageMod
         name,
         totalQuantity: parseInt(totalQuantity) || 0,
         vestedQuantity: effectiveVestedQuantity,
+        usedQuantity: parseInt(usedQuantity) || 0,
         averageVestingPrice: parseFloat(averageVestingPrice) || 0,
         firstVestingDate,
         vestingDurationYears: parseInt(vestingDurationYears) || 4,
@@ -236,41 +236,41 @@ export function AddPackageModal({ type, editingPackage, onClose }: AddPackageMod
             </div>
           </div>
 
-          {/* Used Quantity - only for options */}
-          {isOption && (
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label className={styles.label}>Used (Exercised) Quantity</label>
-                <input
-                  type="number"
-                  className={`${styles.input} ${errors.usedQuantity ? styles.inputError : ''}`}
-                  value={usedQuantity}
-                  onChange={(e) => setUsedQuantity(e.target.value)}
-                  placeholder="0"
-                  min="0"
-                  max={effectiveVestedQuantity.toString()}
-                />
-                {errors.usedQuantity && <span className={styles.errorText}>{errors.usedQuantity}</span>}
-              </div>
-
-              <div className={styles.field}>
-                <label className={styles.label}>
-                  Available to Exercise
-                  <span className={styles.calculatedBadge}>Auto</span>
-                </label>
-                <input
-                  type="number"
-                  className={styles.inputCalculated}
-                  value={availableQuantity}
-                  readOnly
-                  disabled
-                />
-                <span className={styles.helpText}>
-                  Vested - Used
-                </span>
-              </div>
+          {/* Used Quantity - for both options and RSUs */}
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label}>
+                {isOption ? 'Used (Exercised) Quantity' : 'Used (Sold) Quantity'}
+              </label>
+              <input
+                type="number"
+                className={`${styles.input} ${errors.usedQuantity ? styles.inputError : ''}`}
+                value={usedQuantity}
+                onChange={(e) => setUsedQuantity(e.target.value)}
+                placeholder="0"
+                min="0"
+                max={effectiveVestedQuantity.toString()}
+              />
+              {errors.usedQuantity && <span className={styles.errorText}>{errors.usedQuantity}</span>}
             </div>
-          )}
+
+            <div className={styles.field}>
+              <label className={styles.label}>
+                {isOption ? 'Available to Exercise' : 'Available to Sell'}
+                <span className={styles.calculatedBadge}>Auto</span>
+              </label>
+              <input
+                type="number"
+                className={styles.inputCalculated}
+                value={availableQuantity}
+                readOnly
+                disabled
+              />
+              <span className={styles.helpText}>
+                Vested - Used
+              </span>
+            </div>
+          </div>
 
           {isOption ? (
             <div className={styles.row}>

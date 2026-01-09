@@ -30,6 +30,7 @@ export interface RSUPackage {
   name: string;
   totalQuantity: number;
   vestedQuantity: number; // Calculated or manually overridden
+  usedQuantity: number; // Already sold/used
   averageVestingPrice: number; // USD
   firstVestingDate: string; // ISO format (grant date for vesting calculation)
   vestingDurationYears: number; // Default: 4
@@ -109,6 +110,7 @@ export interface RSUFormData {
   name: string;
   totalQuantity: number;
   vestedQuantity?: number; // Optional - calculated automatically if not provided
+  usedQuantity: number; // Already sold/used
   averageVestingPrice: number;
   firstVestingDate: string;
   vestingDurationYears: number;

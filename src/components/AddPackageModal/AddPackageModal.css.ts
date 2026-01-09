@@ -19,7 +19,9 @@ export const modal = style({
   width: '100%',
   maxWidth: '500px',
   maxHeight: '90vh',
-  overflow: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden', // Don't scroll the whole modal
 });
 
 export const header = style({
@@ -28,6 +30,8 @@ export const header = style({
   alignItems: 'center',
   padding: vars.space.lg,
   borderBottom: `1px solid ${vars.color.border}`,
+  flexShrink: 0, // Don't shrink the header
+  backgroundColor: vars.color.surface, // Ensure background is solid
 });
 
 export const title = style({
@@ -56,6 +60,9 @@ export const form = style({
   display: 'flex',
   flexDirection: 'column',
   gap: vars.space.md,
+  overflowY: 'auto', // Only the form content scrolls
+  flex: 1, // Take remaining space
+  minHeight: 0, // Allow shrinking for flex children
 });
 
 export const field = style({
@@ -141,6 +148,8 @@ export const footer = style({
   gap: vars.space.sm,
   padding: vars.space.lg,
   borderTop: `1px solid ${vars.color.border}`,
+  flexShrink: 0, // Don't shrink the footer
+  backgroundColor: vars.color.surface, // Ensure background is solid
 });
 
 export const button = style({

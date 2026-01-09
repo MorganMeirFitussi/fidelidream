@@ -73,8 +73,10 @@ export function PackageCard({ package_, type, currentStockPrice, onEdit, onDelet
         ) : (
           <>
             <div className={styles.detailItem}>
-              <span className={styles.detailLabel}>Vested Qty</span>
-              <span className={styles.detailValue}>{rsu.vestedQuantity.toLocaleString()}</span>
+              <span className={styles.detailLabel}>Vested / Used</span>
+              <span className={styles.detailValue}>
+                {rsu.vestedQuantity.toLocaleString()} / {(rsu.usedQuantity || 0).toLocaleString()}
+              </span>
             </div>
             <div className={styles.detailItem}>
               <span className={styles.detailLabel}>Avg Vesting Price</span>

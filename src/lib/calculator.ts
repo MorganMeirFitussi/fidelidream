@@ -108,20 +108,23 @@ export function calculateEquity(
   // Process RSUs
   for (const rsu of rsus) {
     const vestedQty = rsu.vestedQuantity;
-    if (vestedQty <= 0) continue;
+    const usedQty = rsu.usedQuantity || 0;
+    const availableQty = Math.max(0, vestedQty - usedQty);
+    
+    if (availableQty <= 0) continue;
     
     // Convert vesting price to NIS
     const vestingPriceNIS = rsu.averageVestingPrice * exchangeRate;
     
-    const grossValueNIS = stockPriceNIS * vestedQty;
+    const grossValueNIS = stockPriceNIS * availableQty;
     const grossValueUSD = grossValueNIS / exchangeRate;
     
     // Work income = vesting price × qty
-    const workIncomeNIS = vestingPriceNIS * vestedQty;
+    const workIncomeNIS = vestingPriceNIS * availableQty;
     totalWorkIncomeNIS += workIncomeNIS;
     
     // Capital gain = (sellPrice - vestingPrice) × qty
-    const capitalGainNIS = Math.max(0, (stockPriceNIS - vestingPriceNIS) * vestedQty);
+    const capitalGainNIS = Math.max(0, (stockPriceNIS - vestingPriceNIS) * availableQty);
     
     packagesData.push({
       id: rsu.id,
